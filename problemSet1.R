@@ -155,3 +155,50 @@ names(lookup)<-as.character(0:9)
 
 digit.col<-lookup[as.character(pendigits$digit)]
 #                                            # color coding
+
+# 1)
+
+pendigits.pca<-prcomp(pendigits)
+pendigits.pca
+
+summary(pendigits.pca)
+
+#Dalla cumulative proportion si nota che le prime 2 componenti presentano circa il 53% della varianza dei dati.
+#Le prime 3 circa il 69%, mentre le prime 4 circa il 78%. Già dalla 5a pc si ottiene poco incremento di varianza (circa 6%), 
+#quindi io terrei le prime 4. Però adesso tramite lo screeplot cerco una conferma con l'elbow method
+
+n<-dim(pendigits)[1];n
+p<-dim(pendigits)[2];p
+
+plot(1:p,pendigits.pca$sdev^2,type="b")
+
+# screeplot
+screeplot(pendigits.pca, type="lines", main="Screeplot for pendigits data")
+abline(v=4, col="blue", lty=2, lwd=2)
+#lo screeplot non è di particolare aiuto in questo caso, in quanto non c'è un elbow evidente. 
+
+# 2) l'esercizio 2 richiede di utilizzare le prime 3 PCs.
+
+qqnorm(pendigits.pca$x[,1], pch=16)
+qqline(pendigits.pca$x[,1], col="red") #heavy tailed
+
+qqnorm(pendigits.pca$x[,2], pch=16)
+qqline(pendigits.pca$x[,2], col="red") #heavy tailed
+
+qqnorm(pendigits.pca$x[,3], pch=16)
+qqline(pendigits.pca$x[,3], col="red") #normal
+
+# 3)
+d <- as.data.frame(pendigits.pca$x[,1:3])
+d$Group1 <- pendigits$digit
+
+mycols <- c("forestgreen", "gold", "dodgerblue", "green", "red", "orange", "yellow", "blue", "black")
+pairs(pendigits.pca$x[, 1:3],lower.panel=NULL,
+      col=mycols,pch=16)
+# 4)
+boxplot(pendigits.pca$x[,1],main="PC1")
+boxplot(pendigits.pca$x[,2],main="PC2")
+boxplot(pendigits.pca$x[,3],main="PC3")
+
+
+
