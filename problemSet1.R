@@ -113,7 +113,7 @@ p
 X<-DF
 # one<-rep(1,n)
 # D<-as.matrix(X-one%*%t(bar.x))
-D<-scale(DF,scale=F)
+D<-scale(DF,scale=F) # centro rispetto alla media (no dev.std.)
 
 d<-rep(0,n)
 for(i in 1:n) d[i]<-t(D[i,])%*%solve(varcov)%*%D[i,]
@@ -134,6 +134,71 @@ text(qchisq(ppoints(d),df=p),sort(d),label=order(d),
 ##############################################
 
 ## Exercise 2
+
+# 1)
+# PDF derivazione autovalori, calcolo della PEV e determinazione
+# di rho rchiesta
+
+# 2) 
+# PDF derivazione matematica degli autovettori
+
+# provo a simulare e vedere se i risultati combaciano
+# definisco la distribuzione una volta con corr (rho) <0 e una
+# con corr >0
+A <- matrix(c(1,-0.1,0,  -0.1,1,-0.1,  0,-0.1,1), 3, 3)
+B <- matrix(c(1,0.1,0,  0.1,1,0.1,  0,0.1,1), 3, 3)
+
+# calcolo gli autovalori e vettori in entrambi i casi. gli autovettori
+# sono giusti e i primi due (la seconda colonna e la prima) mi danno
+# le prime 2 PC
+pr1 <- eigen(A)
+pr2 <- eigen(B)
+
+# ora provo a simulare e ad usare il comando prcomp sui dati
+# passo quindi sal population level al sample level
+XA<- mvrnorm(n=10000, mu=c(1,-1,2), Sigma=A)
+XB<- mvrnorm(n=10000, mu=c(1,-1,2), Sigma=B)
+
+pca.normA<- prcomp(XA)
+pca.normB<- prcomp(XB)
+# le PC sono praticamente uguali agli autovettori a meno di
+# qualche piccola differenza dovuta al fatto che stiamo simulando
+
+# 3)
+# PDF derivazione di Z e dei suoi parametri come combinazione
+# lineare di X
+
+# 4)
+
+rho <- -2/3
+muz <- c(2,-3)
+Sigz <- matrix(c(2-2*rho, 2*rho-1, 2*rho-1, 2-2*rho), ncol=2, ,byrow = T)
+
+plot(muz[1], muz[2], xlab="Z1", ylab="Z2", main="Correlation = -2/3", pch=16,
+     xlim=c(-6,10), ylim=c(-11,5))
+library(ellipse)
+abline(0,0)
+abline(v=0)
+lines(ellipse(x=Sigz,centre=muz,level=0.95),col="red",lwd=1.5)
+# 5)
+
+# con rho=2/3 le varianze diminuiscono e la correlazione
+# diventa positiva quindi l'ellisse è più piccola e l'asse
+# maggiore cambia segno diventando parallelo alla retta y=x
+
+# codice per plottare il disegno anche se non chiesto
+'
+rho <- 2/3
+Sigz2 <- matrix(c(2-2*rho, 2*rho-1, 2*rho-1, 2-2*rho), ncol=2, ,byrow = T)
+
+plot(muz[1], muz[2], xlab="Z1", ylab="Z2", main="Correlation = -2/3", pch=16,
+     xlim=c(-6,10), ylim=c(-11,5))
+
+abline(0,0)
+abline(v=0)
+lines(ellipse(x=Sigz2,centre=muz,level=0.95),col="red",lwd=1.5)
+# 5)
+'
 
 ##############################################
 ##############################################
