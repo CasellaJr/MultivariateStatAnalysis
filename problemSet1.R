@@ -232,18 +232,18 @@ lines(ellipse(x=Sigz2,centre=muz,level=0.95),col="red",lwd=1.5)
 
 ## Pen digit data
 
-pendigits<-read.table("data/pendigits.txt", sep=",",head=F)
+pendig<-read.table("data/pendigits.txt", sep=",",head=F)
 
-names(pendigits)<-c(paste0(rep(c("x","y"),8),rep(1:8,each=2)),"digit")
+names(pendig)<-c(paste0(rep(c("x","y"),8),rep(1:8,each=2)),"digit")
 
-head(pendigits)
-dim(pendigits)
+head(pendig)
+dim(pendig)
 
 lookup<-c("darkgreen",  "brown", "lightblue",  "magenta", "purple", 
           "blue", "red", "lightgreen", "orange", "cyan")
 names(lookup)<-as.character(0:9)
 
-digit.col<-lookup[as.character(pendigits$digit)]
+digit.col<-lookup[as.character(pendig$digit)]
 #                                            # color coding
 
 'Bisogna togliere la colonna digits dal dataset altrimenti
@@ -251,27 +251,37 @@ la considera come variabile (con varianza da spiegare)
 mentre è solo una label'
 # 1)
 
-pendigits.pca<-prcomp(pendigits)
-pendigits.pca
-
-summary(pendigits.pca)
-
-#Dalla cumulative proportion si nota che le prime 2 componenti presentano circa il 53% della varianza dei dati.
-#Le prime 3 circa il 69%, mentre le prime 4 circa il 78%. Già dalla 5a pc si ottiene poco incremento di varianza (circa 6%), 
-#quindi io terrei le prime 4. Però adesso tramite lo screeplot cerco una conferma con l'elbow method
+pendigits <- pendig
+pendigits$digit <- NULL
 
 n<-dim(pendigits)[1];n
 p<-dim(pendigits)[2];p
 
-plot(1:p,pendigits.pca$sdev^2,type="b")
+pendigits.pca<-prcomp(pendigits)
+pendigits.Npca<-prcomp(pendigits, scale=T)
+pendigits.pca
+
+summary(pendigits.pca)
+pendigits.Npca$sdev^2
+
+plot(1:p,pendigits.Npca$sdev^2,type="b")
+abline(h=1)
+
+#Dalla cumulative proportion si nota che le prime 2 componenti presentano circa il 53% della varianza dei dati.
+#Le prime 3 circa il 69%, mentre le prime 4 circa il 78%. Già dalla 5a pc si ottiene poco incremento di varianza (circa 6%), 
+#quindi io terrei le prime 4. 
+# se consideriamo la pca fatta sul dataset standardizzato, notiamo che solo le
+# prime 5 PC hanno varianza maggiore di 1. Anche 5 può essere un buon numero di PC
+# Però adesso tramite lo screeplot cerco una conferma con l'elbow method
 
 # screeplot
 screeplot(pendigits.pca, type="lines", main="Screeplot for pendigits data")
 abline(v=4, col="blue", lty=2, lwd=2)
+abline(v=5, col="blue", lty=2, lwd=2)
 #lo screeplot non è di particolare aiuto in questo caso, in quanto non c'è un elbow evidente. 
 
 # 2) l'esercizio 2 richiede di utilizzare le prime 3 PCs.
-
+# normalità univariata
 qqnorm(pendigits.pca$x[,1], pch=16)
 qqline(pendigits.pca$x[,1], col="red") #heavy tailed
 
@@ -281,17 +291,37 @@ qqline(pendigits.pca$x[,2], col="red") #heavy tailed
 qqnorm(pendigits.pca$x[,3], pch=16)
 qqline(pendigits.pca$x[,3], col="red") #normal
 
-# 3)
+# normalità multivariata
 d <- as.data.frame(pendigits.pca$x[,1:3])
-d$Group1 <- pendigits$digit
 
-mycols <- c("forestgreen", "gold", "dodgerblue", "green", "red", "orange", "yellow", "blue", "black")
-pairs(pendigits.pca$x[, 1:3],lower.panel=NULL,
-      col=mycols,pch=16)
+D<-scale(d,scale=F) # centro rispetto alla media (no dev.std.)
+Mala <- mahalanobis(D,center=colMeans(D),cov=cov(D))
+   
+plot(density(Mala))
+
+plot(qchisq(ppoints(Mala),df=3),sort(Mala),main="Chisq Q-Q plot of Mahalanobis distance",
+     xlab="Theoretical Quantiles",ylab="Sample Quantiles")
+abline(0,1)
+
+# 3)
+outs <- which(Mala>5)
+
+# mycols <- c("forestgreen", "gold", "dodgerblue", "green", "red", "orange", "yellow", "blue", "black")
+pairs(d,lower.panel=NULL,col=lookup,pch=16)
+
+'si riesce a fare lo scatterplot di un colore per volta?'
+
+
 # 4)
 boxplot(pendigits.pca$x[,1],main="PC1")
 boxplot(pendigits.pca$x[,2],main="PC2")
 boxplot(pendigits.pca$x[,3],main="PC3")
 
+outs <- which(Mala>5)
+outt <- pendig$digit[outs]
+
+table(outt)
+hist(outt)
 
 
+#
