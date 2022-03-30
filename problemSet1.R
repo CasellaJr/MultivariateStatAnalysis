@@ -47,10 +47,15 @@ boxplot(x2)
 which(x2 > 1500)  #11 29  Chicago(+3000) e philadelphia
 boxplot(x3)
 which(x3 > 1600)  #come sopra
+
+'
 # parentesi su x2 e x3
+# forse inutile perchè questi outlier non sono outlier nelle
+# singole distribuzioni
 div = x2/x3 # fabbriche con >20 lavoratori per ogni 1k abitanti
 boxplot(div) # ci sono città con tante fabbriche in rapp agli abitanti
 which(div > 1.3) #5 27 31  Hartford Cleveland Providence
+'
 
 boxplot(x4) # ok
 boxplot(x5)
@@ -76,18 +81,26 @@ library(moments)
 qqnorm(x1,pch=16,main="Q-Q plot for x1")
 qqline(x1,col="red") #quite normal
 skewness(x1)
+
 qqnorm(x2,pch=16,main="Q-Q plot for x2")
 qqline(x2,col="red") #right skew distribution
 skewness(x2)
+plot(density(x2))
+
 qqnorm(x3,pch=16,main="Q-Q plot for x3")
 qqline(x3,col="red") #right skew distribution
 skewness(x3)
+plot(density(x3))
+
 qqnorm(x4,pch=16,main="Q-Q plot for x4")
 qqline(x4,col="red") #normal
 skewness(x4)
+
 qqnorm(x5,pch=16,main="Q-Q plot for x5")
 qqline(x5,col="red") #little left skewness
 skewness(x5)
+plot(density(x5))
+
 qqnorm(x6,pch=16,main="Q-Q plot for x6")
 qqline(x6,col="red") #normal
 skewness(x6)
@@ -121,15 +134,25 @@ help("mahalanobis")
 d
 mahalanobis(X,center=colMeans(X),cov=var(X))
 #                                     # the same
-plot(d)
+plot(density(d))
 
 plot(qchisq(ppoints(d),df=p),sort(d),main="Chisq Q-Q plot of Mahalanobis distance",
      xlab="Theoretical Quantiles",ylab="Sample Quantiles")
 abline(0,1)
 text(qchisq(ppoints(d),df=p),sort(d),label=order(d),
      pos=4,cex=0.5,offset=0.3)
-#outliers 1, 9, 11. L'11 era stato identificato anche in precedenza
+# outlier 1, 9, 11. Erano stati tutti identificati in
+# precedenza come outlier univariati in diverse variabili
 
+'
+no_out <- d[-c(1,9,11)]
+plot(qchisq(ppoints(no_out),df=p),sort(no_out),main="Chisq Q-Q plot of Mahalanobis distance",
+     xlab="Theoretical Quantiles",ylab="Sample Quantiles")
+abline(0,1)
+text(qchisq(ppoints(no_out),df=p),sort(no_out),label=order(no_out),
+     pos=4,cex=0.5,offset=0.3)
+# non si trova sulla bisettrice come ci si aspetterebbe
+'
 ##############################################
 ##############################################
 
@@ -183,8 +206,10 @@ lines(ellipse(x=Sigz,centre=muz,level=0.95),col="red",lwd=1.5)
 # 5)
 
 # con rho=2/3 le varianze diminuiscono e la correlazione
-# diventa positiva quindi l'ellisse è più piccola e l'asse
-# maggiore cambia segno diventando parallelo alla retta y=x
+# diventa positiva quindi l'ellisse è più piccola, l'asse maggiore
+# e quello minore cambiano segno e l'asse maggiore diventa
+# parallelo alla retta y=x
+
 
 # codice per plottare il disegno anche se non chiesto
 '
@@ -221,6 +246,9 @@ names(lookup)<-as.character(0:9)
 digit.col<-lookup[as.character(pendigits$digit)]
 #                                            # color coding
 
+'Bisogna togliere la colonna digits dal dataset altrimenti
+la considera come variabile (con varianza da spiegare)
+mentre è solo una label'
 # 1)
 
 pendigits.pca<-prcomp(pendigits)
