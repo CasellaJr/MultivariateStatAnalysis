@@ -144,15 +144,17 @@ text(qchisq(ppoints(d),df=p),sort(d),label=order(d),
 # outlier 1, 9, 11. Erano stati tutti identificati in
 # precedenza come outlier univariati in diverse variabili
 
-'
-no_out <- d[-c(1,9,11)]
+# qqplot senza gli outlier ORA FUNZIONA
+
+DF2 <- DF[-c(1,9,11),]
+no_out <- mahalanobis(DF2,center=colMeans(DF2),cov=var(DF2))
 plot(qchisq(ppoints(no_out),df=p),sort(no_out),main="Chisq Q-Q plot of Mahalanobis distance",
      xlab="Theoretical Quantiles",ylab="Sample Quantiles")
 abline(0,1)
 text(qchisq(ppoints(no_out),df=p),sort(no_out),label=order(no_out),
      pos=4,cex=0.5,offset=0.3)
-# non si trova sulla bisettrice come ci si aspetterebbe
-'
+
+
 ##############################################
 ##############################################
 
@@ -323,5 +325,6 @@ outt <- pendig$digit[outs]
 table(outt)
 hist(outt)
 
-
+install.packages("knitr")
+install.packages("rmarkdown")
 #
