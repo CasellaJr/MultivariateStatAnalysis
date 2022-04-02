@@ -36,17 +36,24 @@ x_bar
 Cors
 varcov
 # commentare le correlazioni
+which(Cors>0.5 & Cors < 0.99)
+which(Cors>0.4 & Cors < 0.5)
+which(Cors<0.0)
+
 '
 COMMENTI
 '
 # 2)
 
 boxplot(x1)
-which(x1 < -71)   #9 Miami
+which(x1 < -71)   #9 
+DF[9,] #9 is Miami
 boxplot(x2)
-which(x2 > 1500)  #11 29  Chicago(+3000) e philadelphia
+which(x2 > 1500)  #11 29  metto >1500 perchè ne vogliamo da testo solo 2 per variabile
+DF[11,]
+DF[29,] #Chicago(+3000) e philadelphia
 boxplot(x3)
-which(x3 > 1600)  #come sopra
+which(x3 > 1600)  #di nuovo 11 e 29
 
 '
 # parentesi su x2 e x3
@@ -59,7 +66,9 @@ which(div > 1.3) #5 27 31  Hartford Cleveland Providence
 
 boxplot(x4) # ok
 boxplot(x5)
-which(x5 < 10)  #1 23 Phoenix Alburquerque
+which(x5 < 10)  #1 23 
+DF[1,] 
+DF[23,] #Phoenix Alburquerque
 boxplot(x6)
 which(x6<60) #stessi due
 
@@ -81,6 +90,7 @@ library(moments)
 qqnorm(x1,pch=16,main="Q-Q plot for x1")
 qqline(x1,col="red") #quite normal
 skewness(x1)
+plot(density(x1))
 
 qqnorm(x2,pch=16,main="Q-Q plot for x2")
 qqline(x2,col="red") #right skew distribution
@@ -95,6 +105,7 @@ plot(density(x3))
 qqnorm(x4,pch=16,main="Q-Q plot for x4")
 qqline(x4,col="red") #normal
 skewness(x4)
+plot(density(x4))
 
 qqnorm(x5,pch=16,main="Q-Q plot for x5")
 qqline(x5,col="red") #little left skewness
@@ -104,6 +115,7 @@ plot(density(x5))
 qqnorm(x6,pch=16,main="Q-Q plot for x6")
 qqline(x6,col="red") #normal
 skewness(x6)
+plot(density(x6))
 
 # 4)
 # plotto i scatterplot per ogni coppia di variabili piazzando sui grafici
@@ -179,6 +191,7 @@ B <- matrix(c(1,0.1,0,  0.1,1,0.1,  0,0.1,1), 3, 3)
 pr1 <- eigen(A)
 pr2 <- eigen(B)
 
+library(MASS)
 # ora provo a simulare e ad usare il comando prcomp sui dati
 # passo quindi sal population level al sample level
 XA<- mvrnorm(n=10000, mu=c(1,-1,2), Sigma=A)
