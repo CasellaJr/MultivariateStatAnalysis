@@ -272,9 +272,9 @@ pendigits$digit <- NULL
 n<-dim(pendigits)[1];n
 p<-dim(pendigits)[2];p
 
-pendigits.pca<-prcomp(pendigits)
+pendigits.pca<-prcomp(pendigits, center=T, scale=T)
 pendigits.Npca<-prcomp(pendigits, scale=T)
-pendigits.pca
+pendigits.Npca
 
 summary(pendigits.pca)
 pendigits.Npca$sdev^2
