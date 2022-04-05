@@ -272,11 +272,12 @@ pendigits$digit <- NULL
 n<-dim(pendigits)[1];n
 p<-dim(pendigits)[2];p
 
-pendigits.pca<-prcomp(pendigits, center=T, scale=T)
+pendigits.pca<-prcomp(pendigits)
 pendigits.Npca<-prcomp(pendigits, scale=T)
+pendigits.pca
 pendigits.Npca
 
-summary(pendigits.pca)
+summary(pendigits.Npca)
 pendigits.Npca$sdev^2
 
 plot(1:p,pendigits.Npca$sdev^2,type="b")
@@ -290,24 +291,24 @@ abline(h=1)
 # Però adesso tramite lo screeplot cerco una conferma con l'elbow method
 
 # screeplot
-screeplot(pendigits.pca, type="lines", main="Screeplot for pendigits data")
+screeplot(pendigits.Npca, type="lines", main="Screeplot for pendigits data")
 abline(v=4, col="blue", lty=2, lwd=2)
 abline(v=5, col="blue", lty=2, lwd=2)
 #lo screeplot non è di particolare aiuto in questo caso, in quanto non c'è un elbow evidente. 
 
 # 2) l'esercizio 2 richiede di utilizzare le prime 3 PCs.
 # normalità univariata
-qqnorm(pendigits.pca$x[,1], pch=16)
-qqline(pendigits.pca$x[,1], col="red") #heavy tailed
+qqnorm(pendigits.Npca$x[,1], pch=16)
+qqline(pendigits.Npca$x[,1], col="red") #heavy tailed
 
-qqnorm(pendigits.pca$x[,2], pch=16)
-qqline(pendigits.pca$x[,2], col="red") #heavy tailed
+qqnorm(pendigits.Npca$x[,2], pch=16)
+qqline(pendigits.Npca$x[,2], col="red") #heavy tailed
 
-qqnorm(pendigits.pca$x[,3], pch=16)
-qqline(pendigits.pca$x[,3], col="red") #normal
+qqnorm(pendigits.Npca$x[,3], pch=16)
+qqline(pendigits.Npca$x[,3], col="red") #normal
 
 # normalità multivariata
-d <- as.data.frame(pendigits.pca$x[,1:3])
+d <- as.data.frame(pendigits.Npca$x[,1:3])
 
 D<-scale(d,scale=F) # centro rispetto alla media (no dev.std.)
 Mala <- mahalanobis(D,center=colMeans(D),cov=cov(D))
@@ -322,17 +323,17 @@ abline(0,1)
 outs <- which(Mala>5)
 
 # mycols <- c("forestgreen", "gold", "dodgerblue", "green", "red", "orange", "yellow", "blue", "black")
-pairs(d,lower.panel=NULL,col=lookup,pch=16)
+pairs(d,lower.panel=NULL,col=digit.col,pch=16)
 
 'si riesce a fare lo scatterplot di un colore per volta?'
 
 
 # 4)
-boxplot(pendigits.pca$x[,1],main="PC1")
-boxplot(pendigits.pca$x[,2],main="PC2")
-boxplot(pendigits.pca$x[,3],main="PC3")
+boxplot(pendigits.Npca$x[,1],main="PC1")
+boxplot(pendigits.Npca$x[,2],main="PC2")
+boxplot(pendigits.Npca$x[,3],main="PC3")
 
-outs <- which(Mala>5)
+outs <- which(pendigits.Npca$x[,3]< -4.5)
 outt <- pendig$digit[outs]
 
 table(outt)
